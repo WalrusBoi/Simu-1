@@ -2,6 +2,7 @@ import random
 import sys
 import time
 import bpy
+import math
 
 # Deselect all objects
 bpy.ops.object.select_all(action='DESELECT')
@@ -23,6 +24,7 @@ food = []
 MATERIAL_GREEN = bpy.data.materials.new(name = "green")
 MATERIAL_GREEN.diffuse_color = (0.0, 1.0, 0.0, 1.0)
 FRAME_RATE = 60
+PI = math.pi
 
 class Food:
     def __init__(self, location, name):
@@ -36,11 +38,17 @@ class Sim:
         self.y = 0 # ^
         self.energy = 10 # energy allows the sims to move
         self.energyPerTurn = 1
-        self.movement = 1/FRAME_RATE # speed allows the sims to 
+        self.movement = 1.5/FRAME_RATE # speed allows the sims to 
         self.range = 5
         self.closestFood = ()
         self.distanceToFood = 1000
         self.foodAte = 0
+        self.angle = 0
+        self.angleChange = {
+            "finalAngle" : None,
+            "changing" : False,
+            "increment" : None
+        }  
 
     def checkValidity(self): # Checks to see if the sims location is on the grid
         if self.x > GRID_LENGTH or self.y > GRID_LENGTH or self.x <  MIN_GRID_LENGTH or self.y < MIN_GRID_LENGTH: 
@@ -78,7 +86,7 @@ class Sim:
                 return True
             else:
                 self.x -= self.movement      
-                return False        
+                return False       
 
         def moveRandomly(): # moves the sim in a random          
             hasMovementOccurred = False # has a player moved yet?
