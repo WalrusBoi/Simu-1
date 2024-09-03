@@ -7,6 +7,7 @@ FRAME_RATE = 60
 GRID_LENGTH = 10
 MIN_GRID_LENGTH = -GRID_LENGTH
 
+current_food = (3, 4)
 class Sim:
     def __init__(self, name):
         self.name = name
@@ -23,6 +24,50 @@ class Sim:
         self.allY = []
     def move(self):
         self.angleMath()
+
+        def moveTowardsFood(): # moves the sim towards the nearest food tile if one is located
+            # self.locateClosestFood() # calls the food function   
+            if self.range >= self.distanceToFood: # in range to spot food
+                distance_x = (self.x - current_food[0]) 
+                distance_y = (self.y - current_food[1])
+                new_angle = math.atan2(distance_y, distance_x) # finds the nearest angle (in degrees)
+                print(new_angle, "THIS IS THE NEW ANGLE")
+                if self.distanceToFood <= self.movement*2: # if the speed (movement per turn) is greater than the distance to the food, it can eat
+                    pass
+            #         howMuchFood = 1
+            #         self.foodAte += howMuchFood
+            #         for i in range(howMuchFood):
+            #             print(self.closestFoodBlender.location)
+            #             bpy.data.objects.remove(self.closestFoodBlender.blenderID)
+            #             food.remove(self.closestFoodBlender) # removes every instance of the food that was just ate
+            #         self.locateClosestFood()
+            
+
+                else:
+                    distance = math.sqrt(((self.x - self.closestFood[0])**2) + ((self.y - self.closestFood[1])**2))                                 
+                    if distance >= self.movement: # if the distance from the object is more than the eating range
+                        pass
+                        # self.angle = 
+                        # if distance_x > 0:
+                        #     moveLeft()
+                        # else:
+                        #     moveRight()
+
+                    # elif abs(distance_y) >= self.movement: # if the distance from the object is more than the eating range
+                    #     if distance_y > 0:
+                    #         moveDown()
+                    #     else:
+                    #         moveUp()
+                        
+                    else:
+                        print("there has been a serious error, investigate")
+                        print(self.closestFood)
+                        print(self.distanceToFood)
+                self.updateLocation()
+                self.energy -= self.energyPerTurn
+            else: 
+                moveForward()
+        
         def moveForward():
             self.printAngleInfo()
             if not self.checkValidity():
@@ -71,7 +116,7 @@ class Sim:
 
 testSim = Sim("one")
 for i in range(10):
-    for j in range(10):
+    for j in range(100):
         testSim.move()
 
 print(len(testSim.allX))
