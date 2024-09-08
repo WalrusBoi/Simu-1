@@ -4,6 +4,7 @@ import time
 import bpy
 import math
 
+
 # Deselect all objects
 bpy.ops.object.select_all(action='DESELECT')
 

@@ -1,75 +1,50 @@
 import math
 import random
 import matplotlib.pyplot as plt
+import sys
 
 PI = math.pi
 FRAME_RATE = 60
 GRID_LENGTH = 10
 MIN_GRID_LENGTH = -GRID_LENGTH
 
-current_food = (3, 4)
+current_food = (5, 5)
 class Sim:
     def __init__(self, name):
         self.name = name
-        self.x = 9.8 # positionary variable
+        self.x = 0 # positionary variable
         self.y = 0 # ^
         self.angle = 0
         self.angleChange = {
             "finalAngle" : None,
             "changing" : False,
-            "increment" : None
+            "increment" : None,
+            "angle_lock": False
         } 
         self.movement = 1.5/FRAME_RATE
         self.allX = []
         self.allY = []
+        self.distanceToFood = sys.maxsize
+        self.range = 3
     def move(self):
-        self.angleMath()
-
+        if not self.angleChange["angle_lock"]:
+            self.angleMath()
         def moveTowardsFood(): # moves the sim towards the nearest food tile if one is located
-            # self.locateClosestFood() # calls the food function   
+            self.locateClosestFood() # calls the food function   
             if self.range >= self.distanceToFood: # in range to spot food
-                distance_x = (self.x - current_food[0]) 
-                distance_y = (self.y - current_food[1])
+                distance_x = (current_food[0] - self.x) 
+                distance_y = (current_food[1] - self.y)
                 new_angle = math.atan2(distance_y, distance_x) # finds the nearest angle (in degrees)
-                print(new_angle, "THIS IS THE NEW ANGLE")
+                self.angleChange["angle_lock"] = True
                 if self.distanceToFood <= self.movement*2: # if the speed (movement per turn) is greater than the distance to the food, it can eat
+                    # angle lock should be false now
+                    print("I can now eat the food")
                     pass
-            #         howMuchFood = 1
-            #         self.foodAte += howMuchFood
-            #         for i in range(howMuchFood):
-            #             print(self.closestFoodBlender.location)
-            #             bpy.data.objects.remove(self.closestFoodBlender.blenderID)
-            #             food.remove(self.closestFoodBlender) # removes every instance of the food that was just ate
-            #         self.locateClosestFood()
-            
-
                 else:
-                    distance = math.sqrt(((self.x - self.closestFood[0])**2) + ((self.y - self.closestFood[1])**2))                                 
-                    if distance >= self.movement: # if the distance from the object is more than the eating range
-                        pass
-                        # self.angle = 
-                        # if distance_x > 0:
-                        #     moveLeft()
-                        # else:
-                        #     moveRight()
-
-                    # elif abs(distance_y) >= self.movement: # if the distance from the object is more than the eating range
-                    #     if distance_y > 0:
-                    #         moveDown()
-                    #     else:
-                    #         moveUp()
-                        
-                    else:
-                        print("there has been a serious error, investigate")
-                        print(self.closestFood)
-                        print(self.distanceToFood)
-                self.updateLocation()
-                self.energy -= self.energyPerTurn
-            else: 
-                moveForward()
+                    self.angle = new_angle
+            moveForward()
         
         def moveForward():
-            self.printAngleInfo()
             if not self.checkValidity():
                 self.angle += PI
                 self.angleChange["finalAngle"] += PI
@@ -78,7 +53,7 @@ class Sim:
             self.allX.append(self.x)
             self.y += round(math.sin(self.angle) * self.movement, 5)
             self.allY.append(self.y)
-        moveForward()
+        moveTowardsFood()
 
     def angleMath(self):
         if self.angleChange["changing"] == True: # if the angle is currently changing           
@@ -101,6 +76,11 @@ class Sim:
                 self.angle -= (PI/(FRAME_RATE*2))
         changeAngle()
     
+    def locateClosestFood(self):
+        distance = math.dist((self.x, self.y), current_food)
+        self.distanceToFood = distance
+            
+    
     def checkValidity(self): # Checks to see if the sims location is on the grid
         if self.x > GRID_LENGTH or self.y > GRID_LENGTH or self.x <  MIN_GRID_LENGTH or self.y < MIN_GRID_LENGTH: 
             return False # returns False if off grid
@@ -110,7 +90,7 @@ class Sim:
     def printCoordinates(self): # debug tool
         print(f'My location is {self.x} and {self.y}')    
 
-    def printAngleInfo(self): # debug tool
+    def act(self): # debug tool
         print(f'Current angle: {self.angle}, Final angle: {self.angleChange["finalAngle"]}, increment: {self.angleChange["increment"]}')  
 
 
